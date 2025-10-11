@@ -1,0 +1,54 @@
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0; 
+  background-image: url("./swe background.jpg");
+  background-size: cover; 
+  background-position: center;
+  opacity: 0.65; 
+  z-index: -1; 
+}
+
+#sidebar {
+  position: fixed;
+  left: 16px;
+  top: 16px;
+  bottom: 16px;
+  width: 150px;
+  padding: 12px;
+  border-radius: 8px;
+  overflow: auto;
+}
+
+#sidebar-list { 
+  list-style: none; 
+  padding: 0; 
+  margin: 0; 
+}
+
+#sidebar-list li.draggable {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.06);
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: grab;
+  margin-bottom: 8px;
+}
+
+#sidebar-list li.draggable:active { 
+  cursor: grabbing; 
+}
+
+/* everything below here is for the space where we combine elements */
+#workspace {
+  margin-left: 240px; 
+  padding: 28px;
+}
+
+.workspace-item {
+  display: inline-block;
+  padding: 8px 12px;
+  margin: 8px;
+  background: rgba(255,255,255,0.92);
+  border-radius: 6px;
+}
