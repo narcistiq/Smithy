@@ -1,0 +1,4 @@
+Django>=5.2,<6.0 #django dependencies
+psycopg2-binary>=2.9 #postgre dependencies adaptor
+python-dotenv>=1.1
+djangorestframework>=3.15
