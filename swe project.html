@@ -7,18 +7,69 @@
     <link rel="stylesheet" href="swe project.css">
 </head>
 <body>
-    <aside id="sidebar" class="page-content" aria-label="Component sidebar">
-        <h3>Components</h3>
-        <ul id="sidebar-list">
-            <li class="draggable" draggable="true">Wood</li>
-            <li class="draggable" draggable="true">Rock</li>
-            <li class="draggable" draggable="true">Stone</li>
-        </ul>
-    </aside>
+    <div id="root"></div>
+<script src = "https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+<script src = "https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel">
+        const { useState } = React;
+        function Sidebar({onDragStart}){
+            const [items]=useState(["Wood", "Water", "Stone"]);
+            return(
+                <aside id="sidebar" className="page-content" aria-label="Component sidebar">
+                    <h3>Components</h3>
+                    <ul id="sidebar-list">
+                        {items.map((item,index)=>(
+                            <li key={index} className="draggable" draggable="true" onDragStart={(e)=>onDragStart(e,item)}>
+                                {item}
+                            </li>
+                        ))}
+                    </ul>
+                </aside>
+            );
+        }
 
-    <main id="workspace" class="page-content" tabindex="0" aria-label="Workspace (drop area)">
-        <p class="workspace-placeholder"></p>
-    </main>
+        function Workspace({workspaceItems, onDrop, onDragOver}){
+            return(
+                <main id="workspace" className="page-content" tabIndex="0" aria-label="Workspace (drop area)"
+                    onDrop={onDrop}
+                    onDragOver={onDragOver}>
+                    {workspaceItems.length === 0 ? (
+                        <p className="workspace-placeholder">Drag items here</p>
+                    ) : (workspaceItems.map((item,i) => (
+                        <div key={i} className="workspace-item">{item}</div>
+                    )))}
+                </main>
+            );
+        }
+        function App(){
+            const [workspaceItems, setWorkspaceItems] = useState([]);
+            const handleDragStart = (e, item) => {
+                e.dataTransfer.setData("text/plain", item);
+            };
+            const handleDrop = (e) => {
+                e.preventDefault();
+                const item = e.dataTransfer.getData("text/plain");
+                setWorkspaceItems((prevItems) => [...prevItems, item]);
+            };
+            const handleDragOver = (e) => {
+                e.preventDefault();
+            };
+           return(
+            <React.Fragment>
+                <Sidebar onDragStart={handleDragStart}/>
+                <Workspace 
+                    workspaceItems={workspaceItems}
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                />  
+            </React.Fragment>);
+           
+        }
+        const container=document.getElementById("root");
+        const root=ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
 
 </body>
 </html>
