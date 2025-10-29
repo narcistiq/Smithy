@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 # Create your models here.
 
 CATEGORIES = [
@@ -19,6 +19,18 @@ class Item(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class UserList(models.Model):    
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    discovered_items = models.ManyToManyField(
+        Item,
+        related_name="discovered_by",  # Lets you find users from an item
+        blank=True  # Allows a user to have an empty list
+    )
+
+    def __str__(self):
+        return f"{self.user.username}'s Profile"
 
 
 class CraftingRecipe(models.Model):
@@ -41,8 +53,6 @@ class CraftingRecipe(models.Model):
         on_delete=models.CASCADE,
         related_name="createdBy"
     )
-    def __str__(self):
-        return f"{self.item_a.name} + {self.item_b.name} = {self.result.name}"
 
     class NoDuplicate:
         unique_together = ('item_a', 'item_b')

@@ -3,11 +3,75 @@
 from django.db import migrations
 
 
+CATEGORIES = {
+    "MAT": "Materials",
+    "LOC": "Location",
+    "FIN": "Final Item",
+}
+
+# This list defines the items you want to add initially
+INITIAL_ITEMS = [
+    {"name": "WOOD", "category": CATEGORIES["MAT"]},
+    {"name": "STONE", "category": CATEGORIES["MAT"]},
+    {"name": "FIRE", "category": CATEGORIES["MAT"]},
+    {"name": "WATER", "category": CATEGORIES["MAT"]},
+    {"name": "LAND", "category": CATEGORIES["LOC"]},
+    {"name": "SHANK", "category": CATEGORIES["FIN"]},
+]
+
+def add_initial_items(apps, schema_editor):
+    """
+    This function is called when the migration is run.
+    """
+    # We get the 'Item' model this way to ensure we're using
+    # the version of the model appropriate for this migration.
+    Item = apps.get_model('smithy', 'Item')
+    
+    print("\nAdding initial items...")
+    
+    for item_data in INITIAL_ITEMS:
+        # 'get_or_create' is safer than 'create'
+        # It won't create a duplicate if an item with the same name
+        # already exists (which is important since 'name' is unique).
+        obj, created = Item.objects.get_or_create(
+            name=item_data["name"],
+            defaults={'category': item_data["category"]}
+        )
+        
+        if created:
+            print(f"  Created: {obj.name} (Category: {obj.category})")
+        else:
+            print(f"  Skipped (already exists): {obj.name}")
+
+def remove_initial_items(apps, schema_editor):
+    """
+    This function is called when the migration is un-applied (rolled back).
+    It should undo what the 'add_initial_items' function did.
+    """
+    Item = apps.get_model('smithy', 'Item')
+    
+    print("\nRemoving initial items...")
+    
+    item_names = [item["name"] for item in INITIAL_ITEMS]
+    
+    # Find all items whose names are in our initial list and delete them
+    items_to_delete = Item.objects.filter(name__in=item_names)
+    
+    count, _ = items_to_delete.delete()
+    print(f"  Deleted {count} items.")
+
+
 class Migration(migrations.Migration):
 
+    # This migration depends on the *previous* migration,
+    # which created the 'Item' table.
+    # Update '0001_initial' to match your *actual* first migration file's name.
     dependencies = [
-        ('smithy', '0001_initial'),
+        ('smithy', '0001_initial'), 
     ]
 
     operations = [
+        # This tells Django to run our custom functions
+        migrations.RunPython(add_initial_items, reverse_code=remove_initial_items),
     ]
+
