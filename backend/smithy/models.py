@@ -23,6 +23,7 @@ class Item(models.Model):
 
 class CraftingRecipe(models.Model):
     # The item being crafted
+    discovered = models.BooleanField(default=False)
     item_a = models.ForeignKey(
         Item,
         on_delete=models.CASCADE,
@@ -40,6 +41,8 @@ class CraftingRecipe(models.Model):
         on_delete=models.CASCADE,
         related_name="createdBy"
     )
+    def __str__(self):
+        return f"{self.item_a.name} + {self.item_b.name} = {self.result.name}"
 
     class NoDuplicate:
         unique_together = ('item_a', 'item_b')
