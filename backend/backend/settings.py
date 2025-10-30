@@ -44,9 +44,11 @@ INSTALLED_APPS = [
     # local
     'smithy',
     'rest_framework',
+    'corsheaders',  # CORS support for frontend
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",  # CORS - must be at top
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -132,3 +134,6 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# CORS settings - allow frontend to call API during development
+CORS_ALLOW_ALL_ORIGINS = True  # For development only

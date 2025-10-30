@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
 from .models import CraftingRecipe, Item, UserList
 from .serializer import UserSerializer
 from typing import Optional
@@ -36,6 +37,7 @@ def addItem(item1, item2):
 def get_user(request):
     return Response(UserSerializer({'name'}))
 
+@csrf_exempt
 @api_view(['POST'])
 def combine_items(request):
     item1_check = request.data.get('item1_name')
