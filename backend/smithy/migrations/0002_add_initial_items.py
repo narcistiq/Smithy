@@ -17,22 +17,20 @@ INITIAL_ITEMS = [
     {"name": "WATER", "category": CATEGORIES["MAT"]},
     {"name": "LAND", "category": CATEGORIES["LOC"]},
     {"name": "SHANK", "category": CATEGORIES["FIN"]},
+    {"name": "STICK", "category": CATEGORIES["MAT"]},
+
 ]
 
+# Item1, Item2, Result
+INITIAL_RECIPES = [("WOOD", "WOOD", "STICK"), ("STICK", "STONE", "SHANK")]
+
+
 def add_initial_items(apps, schema_editor):
-    """
-    This function is called when the migration is run.
-    """
-    # We get the 'Item' model this way to ensure we're using
-    # the version of the model appropriate for this migration.
     Item = apps.get_model('smithy', 'Item')
-    
+    CraftingRecipe = apps.get_model('smithy', 'CraftingRecipe') 
     print("\nAdding initial items...")
-    
+
     for item_data in INITIAL_ITEMS:
-        # 'get_or_create' is safer than 'create'
-        # It won't create a duplicate if an item with the same name
-        # already exists (which is important since 'name' is unique).
         obj, created = Item.objects.get_or_create(
             name=item_data["name"],
             defaults={'category': item_data["category"]}
@@ -42,36 +40,61 @@ def add_initial_items(apps, schema_editor):
             print(f"  Created: {obj.name} (Category: {obj.category})")
         else:
             print(f"  Skipped (already exists): {obj.name}")
+    print("\nAdding initial recipes...")
+
+    for a_name, b_name, result_name in INITIAL_RECIPES:
+        try:
+            # Get the actual Item objects from the DB
+            item_a = Item.objects.get(name=a_name)
+            item_b = Item.objects.get(name=b_name)
+            result_item = Item.objects.get(name=result_name)
+
+            # Now create the recipe using the objects
+            recipe, created = CraftingRecipe.objects.get_or_create(
+                item_a=item_a,
+                item_b=item_b,
+                defaults={'result': result_item}
+            )
+
+            if created:
+                print(
+                    f"  Created recipe: {item_a.name} + "
+                    f" {item_b.name} = {result_item.name}")
+            else:
+                print(f"  Skipped recipe (already exists): "
+                      f"{item_a.name} + {item_b.name}")
+
+        except Item.DoesNotExist:
+            print(f"  ERROR: Could not create recipe. Item not found for: "
+                  f"{a_name}, {b_name}, or {result_name}")
+
 
 def remove_initial_items(apps, schema_editor):
-    """
-    This function is called when the migration is un-applied (rolled back).
-    It should undo what the 'add_initial_items' function did.
-    """
     Item = apps.get_model('smithy', 'Item')
-    
-    print("\nRemoving initial items...")
-    
+    CraftingRecipe = apps.get_model('smithy', 'CraftingRecipe')
+
     item_names = [item["name"] for item in INITIAL_ITEMS]
-    
-    # Find all items whose names are in our initial list and delete them
+    # get items from recipes, a set to handle  dupes
+    result_names = {recipe[2] for recipe in INITIAL_RECIPES}
+
+    # remove decipes
+    recipes_to_delete = CraftingRecipe.objects.filter(
+        result__name__in=result_names
+    )
+    count, _ = recipes_to_delete.delete()
+    print(f"{count}, is deleted")
+
+    # delete all items from list
     items_to_delete = Item.objects.filter(name__in=item_names)
-    
     count, _ = items_to_delete.delete()
-    print(f"  Deleted {count} items.")
+    print(f"{count}, is deleted")
 
 
 class Migration(migrations.Migration):
-
-    # This migration depends on the *previous* migration,
-    # which created the 'Item' table.
-    # Update '0001_initial' to match your *actual* first migration file's name.
     dependencies = [
-        ('smithy', '0001_initial'), 
+        ('smithy', '0001_initial'),
     ]
 
     operations = [
         # This tells Django to run our custom functions
-        migrations.RunPython(add_initial_items, reverse_code=remove_initial_items),
-    ]
-
+        migrations.RunPython(add_initial_items, remove_initial_items)]
