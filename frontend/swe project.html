@@ -70,9 +70,117 @@
                 </main>
             );
         }
+        function LoginModal({ isOpen, onClose, onLogin }) {
+            const [username, setUsername] = useState('');
+            const [password, setPassword] = useState('');
+            const [showForgotPassword, setShowForgotPassword] = useState(false);
+            const [email, setEmail] = useState('');
+
+            const handleLogin = (e) => {
+                e.preventDefault();
+                if (username && password) {
+                    onLogin(username, password);
+                    setUsername('');
+                    setPassword('');
+                    onClose();
+                } else {
+                    alert('Please enter both username and password');
+                }
+            };
+
+            const handleForgotPassword = (e) => {
+                e.preventDefault();
+                if (email) {
+                    alert(`Password reset link sent to: ${email}`);
+                    setEmail('');
+                    setShowForgotPassword(false);
+                } else {
+                    alert('Please enter your email address');
+                }
+            };
+
+            if (!isOpen) return null;
+
+            return (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h2 className="modal-title">⚔️ Return to thy Realm ⚔️</h2>
+                        
+                        {!showForgotPassword ? (
+                            <form onSubmit={handleLogin}>
+                                <div className="form-group">
+                                    <label className="form-label">Username:</label>
+                                    <input
+                                        type="text"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                        className="form-input"
+                                        placeholder="Enter thy username"
+                                    />
+                                </div>
+                                <div className="form-group" style={{ marginBottom: '20px' }}>
+                                    <label className="form-label">Password:</label>
+                                    <input
+                                        type="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="form-input"
+                                        placeholder="Enter thy secret word"
+                                    />
+                                </div>
+                                <div className="btn-container">
+                                    <button type="submit" className="btn-primary">
+                                        🗡️ Enter
+                                    </button>
+                                    <button type="button" onClick={onClose} className="btn-secondary">
+                                        ❌ Cancel
+                                    </button>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowForgotPassword(true)}
+                                    className="forgot-password-btn"
+                                >
+                                    <b>🔑 Forgot thy password?</b>
+                                </button>
+                            </form>
+                        ) : (
+                            <form onSubmit={handleForgotPassword}>
+                                <div className="form-group" style={{ marginBottom: '20px' }}>
+                                    <label className="form-label">Email Address:</label>
+                                    <input
+                                        type="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="form-input"
+                                        placeholder="Enter thy email address"
+                                    />
+                                </div>
+                                <div className="btn-container">
+                                    <button type="submit" className="btn-primary">
+                                         Send Reset Link
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowForgotPassword(false)}
+                                        className="btn-secondary"
+                                    >
+                                         Back
+                                    </button>
+                                </div>
+                            </form>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
         function App(){
             const [workspaceItems, setWorkspaceItems] = useState([]);
             const [draggingIndex, setDraggingIndex] = useState(null);
+            const [isLoggedIn, setIsLoggedIn] = useState(false);
+            const [currentUser, setCurrentUser] = useState('');
+            const [showLoginModal, setShowLoginModal] = useState(false);
             
             const handleDragStart = (e, item) => {
                 e.dataTransfer.setData("text/plain", item);
@@ -127,6 +235,18 @@
                 setTimeout(()=> setMessage(''), 3500);
             }
 
+            const handleLogin = (username, password) => {
+                setCurrentUser(username);
+                setIsLoggedIn(true);
+                showMessage(`Welcome to the realm, ${username}!`);
+            };
+
+            const handleLogout = () => {
+                setCurrentUser('');
+                setIsLoggedIn(false);
+                showMessage('Thou hast left the realm.');
+            };
+
             // called when a workspace item has another item dropped onto it
             const handleItemDrop = async (e, targetIndex) => {
                 e.preventDefault();
@@ -161,26 +281,56 @@
             };
            return(
             <React.Fragment>
+                {/* Login Button */}
+                <div className="login-container">
+                    {!isLoggedIn ? (
+                        <button
+                            onClick={() => setShowLoginModal(true)}
+                            className="login-btn"
+                        >
+                            🏰 Enter thy Realm
+                        </button>
+                    ) : (
+                        <div className="user-status">
+                            <span className="user-name">👑 {currentUser}</span>
+                            <button
+                                onClick={handleLogout}
+                                className="logout-btn"
+                            >
+                                🚪 Logout
+                            </button>
+                        </div>
+                    )}
+                </div>
+
                 <Sidebar onDragStart={handleDragStart}/>
-                    <Workspace 
+                <Workspace 
                     workspaceItems={workspaceItems}
                     onDrop={handleDrop}
                     onDragOver={handleDragOver}
-                        onItemDrag={handleItemDrag}
-                        onItemDrop={handleItemDrop}
+                    onItemDrag={handleItemDrag}
+                    onItemDrop={handleItemDrop}
                 />  
-                    {message && (
-                        <div id="api-message-box" style={{
-                            position: 'fixed',
-                            right: '16px',
-                            bottom: '16px',
-                            padding: '10px 14px',
-                            background: 'rgba(0,0,0,0.8)',
-                            color: '#fff',
-                            borderRadius: '6px',
-                            zIndex: 9999
-                        }}>{message}</div>
-                    )}
+                
+                {/* Login Modal */}
+                <LoginModal 
+                    isOpen={showLoginModal} 
+                    onClose={() => setShowLoginModal(false)}
+                    onLogin={handleLogin}
+                />
+                
+                {message && (
+                    <div id="api-message-box" style={{
+                        position: 'fixed',
+                        right: '16px',
+                        bottom: '16px',
+                        padding: '10px 14px',
+                        background: 'rgba(0,0,0,0.8)',
+                        color: '#fff',
+                        borderRadius: '6px',
+                        zIndex: 9999
+                    }}>{message}</div>
+                )}
             </React.Fragment>);
            
         }
