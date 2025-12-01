@@ -23,4 +23,7 @@ urlpatterns = [
     path("", RedirectView.as_view(url='admin/', permanent=False)),
     path("admin/", admin.site.urls),
     path("api/", include("smithy.urls")),
+    path("", RedirectView.as_view(url="admin/", permanent=False)),  
+    path("admin/", admin.site.urls),                                
+    path("api/", include("smithy.urls")),                           
 ]

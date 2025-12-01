@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 # Create your models here.
 
 CATEGORIES = [
@@ -61,3 +64,8 @@ class CraftingRecipe(models.Model):
         return (
             f"{self.item_a.name} + {self.item_b.name} = "
             f"{self.result.name}")
+
+@receiver(post_save, sender=User)
+def create_user_list(sender, instance, created, **kwargs):
+    if created:
+        UserList.objects.get_or_create(user=instance)

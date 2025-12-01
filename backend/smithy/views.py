@@ -1,6 +1,7 @@
+from urllib import request
 from django.db.models import Q
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -10,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import CraftingRecipe, Item, UserList
 from .serializer import ItemSerializer
 from typing import Optional
+import logging
 
 @csrf_exempt
 @api_view(['POST'])
@@ -60,33 +62,39 @@ def register(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):
-    """Login user and return token"""
     username = request.data.get('username')
     password = request.data.get('password')
-    
+    role = request.data.get('role')  # Expect 'User' or 'Admin' from frontend
+
     if not username or not password:
         return Response(
             {"error": "Username and password are required."},
             status=status.HTTP_400_BAD_REQUEST
         )
-    
+
     user = authenticate(username=username, password=password)
-    
+
     if not user:
         return Response(
             {"error": "Invalid credentials."},
             status=status.HTTP_401_UNAUTHORIZED
         )
-    
-    # Get or create token
+
+    if role == "Admin" and not (user.is_staff or user.is_superuser):
+        return Response({"error": "Not an admin."}, status=status.HTTP_403_FORBIDDEN)
+    if role == "User" and (user.is_staff or user.is_superuser):
+        return Response({"error": "Not a regular user."}, status=status.HTTP_403_FORBIDDEN)
+
     token, _ = Token.objects.get_or_create(user=user)
-    
+
     return Response({
         "message": "Login successful",
         "user": {
             "id": user.id,
             "username": user.username,
-            "email": user.email
+            "email": user.email,
+            "is_staff": user.is_staff,
+            "is_superuser": user.is_superuser
         },
         "token": token.key
     }, status=status.HTTP_200_OK)
@@ -111,7 +119,6 @@ def logout(request):
 
 @api_view(['GET'])
 def get_user_profile(request):
-    """Get current user's profile and discovered items"""
     if not request.user.is_authenticated:
         return Response(
             {"error": "Not authenticated."},
@@ -149,7 +156,6 @@ def get_guest_profile():
 
 
 def combineItems(item1, item2) -> Optional[Item]:
-    """Check if two items can be combined and return result"""
     try:
         query = Q(item_a=item1, item_b=item2) | Q(item_a=item2, item_b=item1)
         recipe = CraftingRecipe.objects.get(query)
@@ -160,7 +166,6 @@ def combineItems(item1, item2) -> Optional[Item]:
 
 @api_view(['GET'])
 def get_all_items(request):
-    """Get all items in the game"""
     items = Item.objects.all()
     serializer = ItemSerializer(items, many=True)
     return Response(serializer.data)
@@ -194,10 +199,13 @@ def get_user(request):
         "total_discovered": discovered.count()
     })
 
-
+logger = logging.getLogger(__name__)
 @csrf_exempt
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def combine_items(request):
+    logger.info(f"Received request data: {request.data}")
+    
     """Combine two items and return the result"""
     item1_check = request.data.get('item1_name')
     item2_check = request.data.get('item2_name')
@@ -209,8 +217,8 @@ def combine_items(request):
         )
     
     try:
-        item1 = Item.objects.get(name=item1_check)
-        item2 = Item.objects.get(name=item2_check)
+        item1 = Item.objects.get(name=item1_check.upper())
+        item2 = Item.objects.get(name=item2_check.upper())
     except Item.DoesNotExist:
         return Response(
             {"error": "One or both items do not exist."},
@@ -239,9 +247,45 @@ def combine_items(request):
         guest_profile.discovered_items.add(result_item)
         message = f"New discovery! You made {result_item.name}!"
         is_new_discovery = True
-    
+
     return Response({
         "message": message,
         "new_item": result_item.name,
         "is_new": is_new_discovery
     }, status=status.HTTP_200_OK)
+
+@csrf_exempt
+@api_view(['POST'])
+def register(request):
+    username = request.data.get('username')
+    email = request.data.get('email')
+    password = request.data.get('password')
+    
+    if not username or not password:
+        return Response(
+            {"error": "Username and password are required."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    if User.objects.filter(username=username).exists():
+        return Response(
+            {"error": "Username already exists."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Create user
+    user = User.objects.create_user(
+        username=username,
+        email=email or '',
+        password=password
+    )
+    # Optionally create a UserList profile if needed
+    UserList.objects.get_or_create(user=user)
+    return Response({
+        "message": "User registered successfully",
+        "user": {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email
+        }
+    }, status=status.HTTP_201_CREATED)

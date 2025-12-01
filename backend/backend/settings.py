@@ -1,4 +1,3 @@
-
 """
 Django settings for backend project.
 
@@ -144,6 +143,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-    ]
+        'rest_framework.permissions.AllowAny',  # Allow unauthenticated access by default
+    ],
 }

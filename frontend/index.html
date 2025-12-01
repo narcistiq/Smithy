@@ -70,32 +70,54 @@
                 </main>
             );
         }
+        // Login Modal Component
         function LoginModal({ isOpen, onClose, onLogin }) {
+            const [isLoginMode, setIsLoginMode] = useState(true);
             const [username, setUsername] = useState('');
-            const [password, setPassword] = useState('');
-            const [showForgotPassword, setShowForgotPassword] = useState(false);
             const [email, setEmail] = useState('');
+            const [password, setPassword] = useState('');
+            const [error, setError] = useState('');
+            const [loading, setLoading] = useState(false);
 
-            const handleLogin = (e) => {
+            const handleSubmit = async (e) => {
                 e.preventDefault();
-                if (username && password) {
-                    onLogin(username, password);
-                    setUsername('');
-                    setPassword('');
-                    onClose();
-                } else {
-                    alert('Please enter both username and password');
-                }
-            };
+                setLoading(true);
+                setError('');
 
-            const handleForgotPassword = (e) => {
-                e.preventDefault();
-                if (email) {
-                    alert(`Password reset link sent to: ${email}`);
-                    setEmail('');
-                    setShowForgotPassword(false);
-                } else {
-                    alert('Please enter your email address');
+                const endpoint = isLoginMode ? 'auth/login/' : 'auth/register/';
+                const payload = isLoginMode 
+                    ? { username, password }
+                    : { username, email, password };
+
+                try {
+                    const response = await fetch(`http://localhost:8000/api/${endpoint}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Token ${token}`,
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const data = await response.json();
+                    console.log('Server response:', response.status, data);
+
+                    if (response.ok) {
+                        localStorage.setItem('auth_token', data.token);
+                        localStorage.setItem('user_data', JSON.stringify(data.user));
+                        onLogin(data.user, data.token);
+                        onClose();
+                        setUsername('');
+                        setEmail('');
+                        setPassword('');
+                    } else {
+                        setError(data.error || 'Something went wrong');
+                    }
+                } catch (err) {
+                    console.error('Registration/Login Error:', err);
+                    setError(`Network error: ${err.message}. Please check if the server is running on http://localhost:8000`);
+                } finally {
+                    setLoading(false);
                 }
             };
 
@@ -104,72 +126,62 @@
             return (
                 <div className="modal-overlay">
                     <div className="modal-content">
-                        <h2 className="modal-title">⚔️ Return to thy Realm ⚔️</h2>
-                        
-                        {!showForgotPassword ? (
-                            <form onSubmit={handleLogin}>
+                        <h2 className="modal-title">
+                            {isLoginMode ? 'Welcome, Noble Knight!' : 'Join the Round Table'}
+                        </h2>
+                        {error && (
+                            <div style={{color: '#ff6b6b', marginBottom: '15px', textAlign: 'center'}}>
+                                {error}
+                            </div>
+                        )}
+                        <form onSubmit={handleSubmit}>
+                            <div className="form-group">
+                                <label className="form-label">Username</label>
+                                <input 
+                                    type="text"
+                                    className="form-input"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            {!isLoginMode && (
                                 <div className="form-group">
-                                    <label className="form-label">Username:</label>
-                                    <input
-                                        type="text"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
-                                        className="form-input"
-                                        placeholder="Enter thy username"
-                                    />
-                                </div>
-                                <div className="form-group" style={{ marginBottom: '20px' }}>
-                                    <label className="form-label">Password:</label>
-                                    <input
-                                        type="password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        className="form-input"
-                                        placeholder="Enter thy secret word"
-                                    />
-                                </div>
-                                <div className="btn-container">
-                                    <button type="submit" className="btn-primary">
-                                        🗡️ Enter
-                                    </button>
-                                    <button type="button" onClick={onClose} className="btn-secondary">
-                                        ❌ Cancel
-                                    </button>
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={() => setShowForgotPassword(true)}
-                                    className="forgot-password-btn"
-                                >
-                                    <b>🔑 Forgot thy password?</b>
-                                </button>
-                            </form>
-                        ) : (
-                            <form onSubmit={handleForgotPassword}>
-                                <div className="form-group" style={{ marginBottom: '20px' }}>
-                                    <label className="form-label">Email Address:</label>
-                                    <input
+                                    <label className="form-label">Email</label>
+                                    <input 
                                         type="email"
+                                        className="form-input"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="form-input"
-                                        placeholder="Enter thy email address"
                                     />
                                 </div>
-                                <div className="btn-container">
-                                    <button type="submit" className="btn-primary">
-                                         Send Reset Link
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowForgotPassword(false)}
-                                        className="btn-secondary"
-                                    >
-                                         Back
-                                    </button>
-                                </div>
-                            </form>
-                        )}
+                            )}
+                            <div className="form-group">
+                                <label className="form-label">Password</label>
+                                <input 
+                                    type="password"
+                                    className="form-input"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="btn-container">
+                                <button type="submit" className="btn-primary" disabled={loading}>
+                                    {loading ? 'Please wait...' : (isLoginMode ? 'Login' : 'Register')}
+                                </button>
+                                <button type="button" className="btn-secondary" onClick={onClose}>
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                        <button 
+                            type="button" 
+                            className="forgot-password-btn"
+                            onClick={() => setIsLoginMode(!isLoginMode)}
+                        >
+                            {isLoginMode ? 'Need an account? Register here' : 'Already have an account? Login here'}
+                        </button>
                     </div>
                 </div>
             );
@@ -178,9 +190,45 @@
         function App(){
             const [workspaceItems, setWorkspaceItems] = useState([]);
             const [draggingIndex, setDraggingIndex] = useState(null);
-            const [isLoggedIn, setIsLoggedIn] = useState(false);
-            const [currentUser, setCurrentUser] = useState('');
+            const [user, setUser] = useState(null);
+            const [authToken, setAuthToken] = useState(null);
             const [showLoginModal, setShowLoginModal] = useState(false);
+
+            // Check for existing authentication on page load
+            useEffect(() => {
+                const token = localStorage.getItem('auth_token');
+                const userData = localStorage.getItem('user_data');
+                if (token && userData) {
+                    setAuthToken(token);
+                    setUser(JSON.parse(userData));
+                }
+            }, []);
+
+            const handleLogin = (userData, token) => {
+                setUser(userData);
+                setAuthToken(token);
+            };
+
+            const handleLogout = async () => {
+                try {
+                    if (authToken) {
+                        await fetch('http://localhost:8000/api/auth/logout/', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Token ${authToken}`,
+                                'Content-Type': 'application/json',
+                            }
+                        });
+                    }
+                } catch (err) {
+                    console.error('Logout error:', err);
+                } finally {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_data');
+                    setUser(null);
+                    setAuthToken(null);
+                }
+            };
             
             const handleDragStart = (e, item) => {
                 e.dataTransfer.setData("text/plain", item);
@@ -235,18 +283,6 @@
                 setTimeout(()=> setMessage(''), 3500);
             }
 
-            const handleLogin = (username, password) => {
-                setCurrentUser(username);
-                setIsLoggedIn(true);
-                showMessage(`Welcome to the realm, ${username}!`);
-            };
-
-            const handleLogout = () => {
-                setCurrentUser('');
-                setIsLoggedIn(false);
-                showMessage('Thou hast left the realm.');
-            };
-
             // called when a workspace item has another item dropped onto it
             const handleItemDrop = async (e, targetIndex) => {
                 e.preventDefault();
@@ -270,7 +306,7 @@
                     if (resp.ok){
                         showMessage(data.message || JSON.stringify(data));
                         if (data.is_new && data.new_item){
-                            // add new item near target
+                            // add new item near the target
                             setWorkspaceItems(prev => [...prev, {
                                 name: data.new_item,
                                 x: (target.x || 0) + 40,
@@ -286,56 +322,49 @@
             };
            return(
             <React.Fragment>
-                {/* Login Button */}
+                {/* Login/User Status */}
                 <div className="login-container">
-                    {!isLoggedIn ? (
-                        <button
-                            onClick={() => setShowLoginModal(true)}
-                            className="login-btn"
-                        >
-                            🏰 Enter thy Realm
-                        </button>
-                    ) : (
+                    {user ? (
                         <div className="user-status">
-                            <span className="user-name">👑 {currentUser}</span>
-                            <button
-                                onClick={handleLogout}
-                                className="logout-btn"
-                            >
-                                🚪 Logout
+                            <span className="user-name">Sir {user.username}</span>
+                            <button className="logout-btn" onClick={handleLogout}>
+                                Logout
                             </button>
                         </div>
+                    ) : (
+                        <button className="login-btn" onClick={() => setShowLoginModal(true)}>
+                            Login
+                        </button>
                     )}
                 </div>
 
                 <Sidebar onDragStart={handleDragStart}/>
-                <Workspace 
+                    <Workspace 
                     workspaceItems={workspaceItems}
                     onDrop={handleDrop}
                     onDragOver={handleDragOver}
-                    onItemDrag={handleItemDrag}
-                    onItemDrop={handleItemDrop}
+                        onItemDrag={handleItemDrag}
+                        onItemDrop={handleItemDrop}
                 />  
-                
-                {/* Login Modal */}
+
                 <LoginModal 
-                    isOpen={showLoginModal} 
+                    isOpen={showLoginModal}
                     onClose={() => setShowLoginModal(false)}
                     onLogin={handleLogin}
                 />
-                
-                {message && (
-                    <div id="api-message-box" style={{
-                        position: 'fixed',
-                        right: '16px',
-                        bottom: '16px',
-                        padding: '10px 14px',
-                        background: 'rgba(0,0,0,0.8)',
-                        color: '#fff',
-                        borderRadius: '6px',
-                        zIndex: 9999
-                    }}>{message}</div>
-                )}
+
+                    {message && (
+                        <div id="api-message-box" style={{
+                            position: 'fixed',
+                            right: '16px',
+                            bottom: '16px',
+                            padding: '10px 14px',
+                            background: 'rgba(0,0,0,0.8)',
+                            color: '#fff',
+                            borderRadius: '6px',
+                            zIndex: 9999
+                        }}>{message}</div>
+                    )}
             </React.Fragment>);
            
         }

@@ -1,0 +1,49 @@
+{
+
+    "categories": {
+        "MAT": "Materials",
+        "LOC": "Location",
+        "FIN": "Final Item"
+    },
+    "items": [
+        {"name": "WOOD", "category": "Materials"},
+        {"name": "STONE", "category": "Materials"},
+        {"name": "WATER", "category": "Materials"},
+        {"name": "EARTH", "category": "Materials"},
+        {"name": "STICK", "category": "Materials"},
+        {"name": "SHAFT", "category": "Materials"},
+        {"name": "FIRE", "category": "Materials"},
+        {"name": "CHARCOAL", "category": "Materials"},
+        {"name": "ASH", "category": "Materials"},
+        {"name": "MUD", "category": "Materials"},
+        {"name": "CLAY", "category": "Materials"},
+        {"name": "BRICK", "category": "Materials"},
+        {"name": "SHARP_STONE", "category": "Materials"},
+        {"name": "ROPE", "category": "Materials"},
+        {"name": "WALL", "category": "Location"},
+        {"name": "SHELTER", "category": "Location"},
+        {"name": "FORGE", "category": "Location"},
+        {"name": "SPEAR", "category": "Final Item"},
+        {"name": "AXE", "category": "Final Item"},
+        {"name": "HAMMER", "category": "Final Item"},
+        {"name": "CAMPFIRE", "category": "Location"}
+    ],
+    "recipes": [
+        ["WOOD", "WOOD", "STICK"],
+        ["WOOD", "STONE", "SHAFT"],
+        ["STICK", "STICK", "FIRE"],
+        ["FIRE", "WOOD", "CHARCOAL"],
+        ["FIRE", "CHARCOAL", "ASH"],
+        ["EARTH", "WATER", "MUD"],
+        ["MUD", "FIRE", "BRICK"],
+        ["EARTH", "MUD", "CLAY"],
+        ["BRICK", "BRICK", "WALL"],
+        ["WALL", "WALL", "SHELTER"],
+        ["STONE", "STONE", "SHARP_STONE"],
+        ["SHAFT", "SHARP_STONE", "SPEAR"],
+        ["STICK", "SHARP_STONE", "AXE"],
+        ["SHAFT", "STONE", "HAMMER"],
+        ["STONE", "FIRE", "CAMPFIRE"],
+        ["BRICK", "FIRE", "FORGE"]
+    ]
+}
