@@ -10,11 +10,6 @@ from .models import CraftingRecipe, Item, UserList
 from .serializer import ItemSerializer
 from typing import Optional
 
-
-# ============================================================================
-# AUTHENTICATION VIEWS
-# ============================================================================
-
 @csrf_exempt
 @api_view(['POST'])
 def register(request):
@@ -143,10 +138,6 @@ def get_user_profile(request):
         )
 
 
-# ============================================================================
-# GAME LOGIC VIEWS
-# ============================================================================
-
 def get_guest_profile():
     """Get or create guest user profile"""
     guest_user, _ = User.objects.get_or_create(username="guest")
@@ -164,7 +155,6 @@ def combineItems(item1, item2) -> Optional[Item]:
         return None
 
 
-<<<<<<< Updated upstream
 @api_view(['GET'])
 def get_all_items(request):
     """Get all items in the game"""
@@ -197,16 +187,6 @@ def get_user(request):
     serializer = ItemSerializer(discovered, many=True)
     return Response({
         "username": guest_profile.user.username,
-=======
-@api_view(['GET'])
-def get_user(request):
-    """Get current user's discovered items"""
-    user_profile = get_guest_profile()
-    discovered = user_profile.discovered_items.all()
-    serializer = UserSerializer(discovered, many=True)
-    return Response({
-        "username": user_profile.user.username,
->>>>>>> Stashed changes
         "discovered_items": serializer.data,
         "total_discovered": discovered.count()
     })
