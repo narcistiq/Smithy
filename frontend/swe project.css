@@ -1,7 +1,7 @@
 body {
   margin: 0;
   padding: 0;
-  background-image:linear-gradient(rgba(255,255,255,0.35), rgba(255,255,255,0.35)), url("./swe background.jpg");
+  background-image:linear-gradient(rgba(255,255,255,0.35), rgba(255,255,255,0.35)), url("./images/swe background.jpg");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -19,23 +19,25 @@ body {
   overflow: auto;
 }
 
-#sidebar-list { 
-  list-style: none; 
+.sidebar-list { 
   padding: 0; 
   margin: 0; 
 }
 
-#sidebar-list li.draggable {
-  background: #fff;
+.sidebar-list .items .draggable {
   border: 1px solid rgba(0,0,0,0.06);
-  padding: 10px 12px;
+  padding: 5px 6px;
   border-radius: 6px;
   cursor: grab;
   margin-bottom: 8px;
 }
 
-#sidebar-list li.draggable:active { 
+.sidebar-list .items .draggable:active { 
   cursor: grabbing; 
+}
+
+.sidebar-list .items .item-name {
+  margin-top: -1.25rem;
 }
 
 /* everything below here is for the space where we combine elements */
@@ -50,11 +52,9 @@ body {
   display: inline-block;
   padding: 8px 12px;
   margin: 0;
-  background: rgba(255,255,255,0.92);
   border-radius: 6px;
   cursor: move;
   user-select: none;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .workspace-item:active {
