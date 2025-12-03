@@ -11,15 +11,11 @@ python -m venv venv
 
 venv\Scripts\activate
 
-
-
 pip install -r requirements.txt
 
 python manage.py migrate
 
 python manage.py runserver
-
-
 
 PostgreSQL init:
 
@@ -34,3 +30,12 @@ GRANT ALL PRIVILEGES ON DATABASE smithy TO smithy_admin;
 
 --quit
 \q
+
+--To open website, type into terminal:
+cd frontend
+python -m http.server 3000
+
+--Access site with
+http://localhost:3000/
+
+
