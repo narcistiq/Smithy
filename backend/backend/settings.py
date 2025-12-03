@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+import dj_database_url
 load_dotenv()
 
 
@@ -86,15 +87,11 @@ WSGI_APPLICATION = "backend.wsgi.application"
 
 
 DATABASES = {
-    "default": {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'smithy', #game name, admin user, password
-        'USER': 'smithy_admin',
-        'PASSWORD': "KnightsOTRT",
-        'HOST': 'localhost', #is this good? Are we doing remote server idk
-        'PORT': '5432', #this is just default postgresql port
-    }
-
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL'),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 # Password validation
