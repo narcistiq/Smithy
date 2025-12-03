@@ -41,6 +41,7 @@ python manage.py migrate smithy
 python manage.py runserver # to start the backend
 
 --To open website, type into terminal:
+
 cd frontend
 
 python -m http.server 3000
