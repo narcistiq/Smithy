@@ -31,6 +31,12 @@ GRANT ALL PRIVILEGES ON DATABASE smithy TO smithy_admin;
 --quit
 \q
 
+--The database may need to be reset if new items are added into the migration. If so run the commands:
+cd backend
+python manage.py migrate smithy zero
+python manage.py migrate smithy
+python manage.py runserver # to start the backend
+
 --To open website, type into terminal:
 cd frontend
 python -m http.server 3000
