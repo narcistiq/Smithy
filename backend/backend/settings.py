@@ -35,6 +35,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "admin_interface",
+    "colorfield",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -44,6 +46,7 @@ INSTALLED_APPS = [
     # local
     'smithy',
     'rest_framework',
+    'rest_framework.authtoken',  # Token authentication
     'corsheaders',  # CORS support for frontend
 ]
 
@@ -137,3 +140,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # CORS settings - allow frontend to call API during development
 CORS_ALLOW_ALL_ORIGINS = True  # For development only
+
+# REST Framework configuration
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ]
+}
