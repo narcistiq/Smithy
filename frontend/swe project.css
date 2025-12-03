@@ -1,3 +1,13 @@
+@font-face {
+  font-family: 'Canterbury';
+  src: url('./fonts/Canterbury.ttf') format('truetype'),
+       url('./fonts/Canterbury.otf') format('opentype'),
+       url('./fonts/Canterbury.woff') format('woff'),
+       url('./fonts/Canterbury.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -60,3 +70,343 @@ body {
 .workspace-item:active {
   cursor: grabbing;
 }
+
+/*  Login Screen Styles */
+.login-container {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+}
+
+.login-btn {
+  padding: 12px 20px;
+  background-color: #8b4513;
+  color: #d4af37;
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: 'Canterbury', serif;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+
+.login-btn:hover {
+  background-color: #d4af37;
+  color: #8b4513;
+  transform: translateY(-2px);
+}
+
+.user-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #2c1810;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 2px solid #d4af37;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.user-name {
+  color: #d4af37;
+  font-family: 'Canterbury', serif;
+  font-weight: bold;
+}
+
+.logout-btn {
+  padding: 6px 12px;
+  background-color: #654321;
+  color: #d4af37;
+  border: 1px solid #8b4513;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: 'Canterbury', serif;
+  cursor: pointer;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.modal-content {
+  background-color: #2c1810;
+  border: 3px solid #8b4513;
+  border-radius: 12px;
+  padding: 30px;
+  min-width: 400px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+  background-image: linear-gradient(rgba(44,24,16,0.25), rgba(44,24,16,0.25)), url("./images/login background.avif");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.modal-title {
+  color: #d4af37;
+  text-align: center;
+  font-size: 24px;
+  font-family: 'Canterbury', serif;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-label {
+  display: block;
+  color: #d4af37;
+  margin-bottom: 5px;
+  font-family: 'Canterbury', serif;
+  font-weight: bold;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #8b4513;
+  border-radius: 6px;
+  background-color: #f5f5dc;
+  font-size: 16px;
+  font-family: 'Canterbury', serif;
+  box-sizing: border-box;
+}
+
+.btn-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.btn-primary {
+  flex: 1;
+  padding: 12px;
+  background-color: #8b4513;
+  color: #d4af37;
+  border: 2px solid #d4af37;
+  border-radius: 6px;
+  font-size: 16px;
+  font-family: 'Canterbury', serif;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #d4af37;
+  color: #8b4513;
+}
+
+.btn-secondary {
+  flex: 1;
+  padding: 12px;
+  background-color: #654321;
+  color: #d4af37;
+  border: 2px solid #8b4513;
+  border-radius: 6px;
+  font-size: 16px;
+  font-family: 'Canterbury', serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #8b4513;
+  color: #d4af37;
+  border-color: #d4af37;
+}
+
+.forgot-password-btn {
+  width: 100%;
+  padding: 8px;
+  background-color: transparent;
+  color: #d4af37;
+  border: none;
+  font-size: 14px;
+  font-family: 'Canterbury', serif;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.login-btn {
+  padding: 12px 20px;
+  background-color: #8b4513;
+  color: #d4af37;
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: 'Canterbury', serif;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+
+.login-btn:hover {
+  background-color: #d4af37;
+  color: #8b4513;
+  transform: translateY(-2px);
+}
+
+.user-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #2c1810;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 2px solid #d4af37;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.user-name {
+  color: #d4af37;
+  font-family: 'Canterbury', serif;
+  font-weight: bold;
+}
+
+.logout-btn {
+  padding: 6px 12px;
+  background-color: #654321;
+  color: #d4af37;
+  border: 1px solid #8b4513;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: 'Canterbury', serif;
+  cursor: pointer;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.modal-content {
+  background-color: #2c1810;
+  border: 3px solid #8b4513;
+  border-radius: 12px;
+  padding: 30px;
+  min-width: 400px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+  background-image: linear-gradient(rgba(44,24,16,0.25), rgba(44,24,16,0.25)), url("./images/login background.avif");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.modal-title {
+  color: #d4af37;
+  text-align: center;
+  font-size: 24px;
+  font-family: 'Canterbury', serif;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-label {
+  display: block;
+  color: #d4af37;
+  margin-bottom: 5px;
+  font-family: 'Canterbury', serif;
+  font-weight: bold;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #8b4513;
+  border-radius: 6px;
+  background-color: #f5f5dc;
+  font-size: 16px;
+  font-family: 'Canterbury', serif;
+  box-sizing: border-box;
+}
+
+.btn-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.btn-primary {
+  flex: 1;
+  padding: 12px;
+  background-color: #8b4513;
+  color: #d4af37;
+  border: 2px solid #d4af37;
+  border-radius: 6px;
+  font-size: 16px;
+  font-family: 'Canterbury', serif;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #d4af37;
+  color: #8b4513;
+}
+
+.btn-secondary {
+  flex: 1;
+  padding: 12px;
+  background-color: #8b4513;
+  color: #d4af37;
+  border: 2px solid #d4af37;
+  border-radius: 6px;
+  font-size: 16px;
+  font-family: 'Canterbury', serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #d4af37;
+  color: #8b4513;
+
+}
+
+.forgot-password-btn {
+  width: 100%;
+  padding: 8px;
+  background-color: transparent;
+  color: #d4af37;
+  border: none;
+  font-size: 14px;
+  font-family: 'Canterbury', serif;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+
+
+
+
+
+
+
