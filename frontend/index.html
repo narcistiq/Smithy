@@ -76,6 +76,7 @@
             const [username, setUsername] = useState('');
             const [email, setEmail] = useState('');
             const [password, setPassword] = useState('');
+            const [isAdmin, setIsAdmin] = useState(false);
             const [error, setError] = useState('');
             const [loading, setLoading] = useState(false);
 
@@ -87,7 +88,7 @@
                 const endpoint = isLoginMode ? 'auth/login/' : 'auth/register/';
                 const payload = isLoginMode 
                     ? { username, password }
-                    : { username, email, password };
+                    : { username, email, password, is_admin: isAdmin };
 
                 try {
                     const response = await fetch(`http://localhost:8000/api/${endpoint}`, {
@@ -110,6 +111,7 @@
                         setUsername('');
                         setEmail('');
                         setPassword('');
+                        setIsAdmin(false);
                     } else {
                         setError(data.error || 'Something went wrong');
                     }
@@ -166,6 +168,19 @@
                                     required
                                 />
                             </div>
+                            {!isLoginMode && (
+                                <div className="form-group">
+                                    <label className="form-label">
+                                        <input 
+                                            type="checkbox"
+                                            checked={isAdmin}
+                                            onChange={(e) => setIsAdmin(e.target.checked)}
+                                            style={{marginRight: '8px'}}
+                                        />
+                                        Register as Admin
+                                    </label>
+                                </div>
+                            )}
                             <div className="btn-container">
                                 <button type="submit" className="btn-primary" disabled={loading}>
                                     {loading ? 'Please wait...' : (isLoginMode ? 'Login' : 'Register')}
