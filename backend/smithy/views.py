@@ -197,6 +197,7 @@ def get_user(request):
 
 @csrf_exempt
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def combine_items(request):
     """Combine two items and return the result"""
     item1_check = request.data.get('item1_name')
@@ -209,8 +210,8 @@ def combine_items(request):
         )
     
     try:
-        item1 = Item.objects.get(name=item1_check)
-        item2 = Item.objects.get(name=item2_check)
+        item1 = Item.objects.get(name=item1_check.upper())
+        item2 = Item.objects.get(name=item2_check.upper())
     except Item.DoesNotExist:
         return Response(
             {"error": "One or both items do not exist."},
