@@ -26,7 +26,37 @@
         {"name": "SPEAR", "category": "Final Item"},
         {"name": "AXE", "category": "Final Item"},
         {"name": "HAMMER", "category": "Final Item"},
-        {"name": "CAMPFIRE", "category": "Location"}
+        {"name": "CAMPFIRE", "category": "Location"},
+
+        {"name": "VINE", "category": "Materials"},
+        {"name": "CAVE", "category": "Location"},
+        {"name": "SAVANNAH", "category": "Location"},
+        { "name": "LEATHER", "category": "Materials" },
+        { "name": "STRING", "category": "Materials" },
+        { "name": "BOW", "category": "Final Item" },
+        { "name": "SHIELD", "category": "Final Item" },
+        { "name": "ARROW", "category": "Final Item" },
+        { "name": "STRAW", "category": "Final Item" },
+
+        {"name": "ORE", "category": "Materials"},
+        {"name": "METAL", "category": "Materials"},
+        {"name": "THREAD", "category": "Materials"},
+        {"name": "CLOTH", "category": "Materials"},
+        
+
+        {"name": "BIG_SHELTER", "category": "Location"},
+        {"name": "MINE", "category": "Location"},
+        {"name": "VILLAGE", "category": "Location"},
+        {"name": "HOUSE", "category": "Location"},
+
+        {"name": "PICKAXE", "category": "Final Item"},
+        {"name": "KNIFE", "category": "Final Item"},
+        {"name": "SWORD", "category": "Final Item"},
+        {"name": "ARMOR", "category": "Final Item"},
+        {"name": "TORCH", "category": "Final Item"},
+        {"name": "BASKET", "category": "Final Item"}
+    ],
+
     ],
     "recipes": [
         ["WOOD", "WOOD", "STICK"],
@@ -44,6 +74,39 @@
         ["STICK", "SHARP_STONE", "AXE"],
         ["SHAFT", "STONE", "HAMMER"],
         ["STONE", "FIRE", "CAMPFIRE"],
-        ["BRICK", "FIRE", "FORGE"]
+
+        ["BRICK", "FIRE", "FORGE"],
+        ["VINE", "STICK", "ROPE"],
+        ["VINE", "VINE", "STRING"],
+        ["FIRE", "EARTH", "LEATHER"],
+        ["LEATHER", "VINE", "STRING"],
+        ["STRING", "STICK", "BOW"],
+        ["SHAFT", "SHARP_STONE", "ARROW"],
+        ["STICK", "STONE", "ARROW"],
+        ["WOOD", "STONE", "SHIELD"],
+        ["WOOD", "LEATHER", "SHIELD"],
+        ["WOOD", "MUD", "STRAW"],
+        ["WOOD", "STRAW", "BIG_SHELTER"],
+
+        ["STONE", "AXE", "ORE"],
+        ["ORE", "FIRE", "METAL"],
+        ["ORE", "FORGE", "METAL"],
+
+        ["STICK", "FIRE", "TORCH"],
+        ["STRAW", "STRING", "BASKET"],
+
+        ["STRING", "LEATHER", "THREAD"],
+        ["THREAD", "THREAD", "CLOTH"],
+        
+
+        ["STONE", "HAMMER", "MINE"],
+        ["SHELTER", "STICK", "VILLAGE"],
+        ["BIG_SHELTER", "BRICK", "HOUSE"],
+
+        ["SHARP_STONE", "STICK", "KNIFE"],
+        ["METAL", "SHAFT", "SWORD"],
+        ["METAL", "STONE", "PICKAXE"]
+        
     ]
 }
+    

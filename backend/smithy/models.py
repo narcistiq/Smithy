@@ -3,8 +3,6 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-# Create your models here.
-
 CATEGORIES = [
     ("Materials", "Materials"),
     ("Location", "Location"),
@@ -17,19 +15,19 @@ class Item(models.Model):
     category = models.CharField(
         max_length=50,
         choices=CATEGORIES,
-        default="Materials"  # Set a sensible default
+        default="Materials"
     )
 
     def __str__(self):
         return self.name
 
 
-class UserList(models.Model):    
+class UserList(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     discovered_items = models.ManyToManyField(
         Item,
-        related_name="discovered_by",  # Lets you find users from an item
-        blank=True  # Allows a user to have an empty list
+        related_name="discovered_by",
+        blank=True
     )
 
     def __str__(self):
@@ -37,33 +35,16 @@ class UserList(models.Model):
 
 
 class CraftingRecipe(models.Model):
-    # The item being crafted
-    discovered = models.BooleanField(default=False)
-    item_a = models.ForeignKey(
-        Item,
-        on_delete=models.CASCADE,
-        related_name="combinationsWithA"
-        )
+    item_a = models.ForeignKey(Item, on_delete=models.CASCADE, related_name="combinationsWithA")
+    item_b = models.ForeignKey(Item, on_delete=models.CASCADE, related_name="combinationsWithB")
+    result = models.ForeignKey(Item, on_delete=models.CASCADE, related_name="createdBy")
 
-    item_b = models.ForeignKey(
-        Item,
-        on_delete=models.CASCADE,
-        related_name="combinationsWithB"
-    )
-
-    result = models.ForeignKey(
-        Item,
-        on_delete=models.CASCADE,
-        related_name="createdBy"
-    )
-
-    class NoDuplicate:
-        unique_together = ('item_a', 'item_b')
+    class Meta:
+        unique_together = (('item_a', 'item_b'),)
 
     def __str__(self):
-        return (
-            f"{self.item_a.name} + {self.item_b.name} = "
-            f"{self.result.name}")
+        return f"{self.item_a.name} + {self.item_b.name} = {self.result.name}"
+
 
 @receiver(post_save, sender=User)
 def create_user_list(sender, instance, created, **kwargs):
