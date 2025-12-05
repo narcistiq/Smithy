@@ -66,16 +66,22 @@ def login(request):
 
     token, _ = Token.objects.get_or_create(user=user)
 
-    return Response({
+    response_data = {
         "message": "Login successful",
         "user": {
             "id": user.id,
             "username": user.username,
-            "email": user.email
+            "email": user.email,
+            "is_staff": user.is_staff,
+            "is_superuser": user.is_superuser
         },
         "token": token.key
-    }, status=200)
+    }
 
+    # Debugging log
+    print("Login response:", response_data)
+
+    return Response(response_data, status=200)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -154,5 +160,6 @@ def combine_items(request):
 
     return Response({
         "message": f"New discovery: {result.name}",
-        "is_new": True
+        "is_new": True,
+        "new_item": result.name.lower()
     })

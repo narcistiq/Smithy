@@ -57,7 +57,6 @@
         {"name": "BASKET", "category": "Final Item"}
     ],
 
-    ],
     "recipes": [
         ["WOOD", "WOOD", "STICK"],
         ["WOOD", "STONE", "SHAFT"],

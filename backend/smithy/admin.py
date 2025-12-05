@@ -9,10 +9,12 @@ class ItemAdmin(admin.ModelAdmin):
 
 @admin.register(CraftingRecipe)
 class CraftingRecipeAdmin(admin.ModelAdmin):
-    list_display = ['item_a', 'item_b', 'result', 'discovered']
+    list_display = ['item_a', 'item_b', 'result', 'is_discovered']
     search_fields = ['item_a__name', 'item_b__name', 'result__name']
-    list_filter = ['discovered']
-    readonly_fields = ['discovered']
+    def is_discovered(self, obj):
+        return UserList.objects.filter(discovered_items=obj.result).exists()
+    is_discovered.boolean = True   
+    is_discovered.short_description = 'Discovered'
 
 @admin.register(UserList)
 class UserListAdmin(admin.ModelAdmin):

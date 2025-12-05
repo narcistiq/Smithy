@@ -13,25 +13,52 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script type="text/babel">
         const { useState, useEffect } = React;
-        const MATERIALS = {
+        
+        // Default images for basic materials
+        const DEFAULT_MATERIALS = {
             stone: "./materials/stone.png",
-            wood: "./materials/wood.png",
+            wood: "./materials/wood.png", 
             water: "./materials/water.png",
-        }
-        function Sidebar({onDragStart}){
+        };
+
+        // Function to get image for any item with fallback handling
+        const getItemImage = (itemName) => {
+            const name = itemName.toLowerCase();
+            // Check if we have a specific image
+            if (DEFAULT_MATERIALS[name]) {
+                return DEFAULT_MATERIALS[name];
+            }
+            // For discovered items, try specific image first, fallback to stone image
+            return `./materials/${name}.png`;
+        };
+        function Sidebar({onDragStart, discoveredItems}){
+            // Always show basic materials, plus any discovered items
+            const allItems = [...Object.keys(DEFAULT_MATERIALS)];
+            if (discoveredItems && discoveredItems.length > 0) {
+                discoveredItems.forEach(item => {
+                    if (!allItems.includes(item.toLowerCase())) {
+                        allItems.push(item.toLowerCase());
+                    }
+                });
+            }
+
             return(
                 <aside id="sidebar" className="page-content" aria-label="Component sidebar">
                     <h3>Materials</h3>
                     <div className="sidebar-list">
-                        {Object.entries(MATERIALS).map(([name,src])=>(   
+                        {allItems.map((name) => (   
                             <div className="items" key={name}>  
                                 <img 
                                     className="draggable" 
-                                    src={src}
+                                    src={getItemImage(name)}
                                     key={name}
                                     alt={name}
                                     draggable="true" 
                                     onDragStart={(e)=>onDragStart(e,name)}
+                                    onError={(e) => {
+                                        // If image fails to load, use stone as fallback
+                                        e.target.src = "./materials/stone.png";
+                                    }}
                                 />
                                 <p className="item-name">{name}</p>  
                             </div>
@@ -95,7 +122,6 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': `Token ${token}`,
                         },
                         body: JSON.stringify(payload)
                     });
@@ -208,18 +234,57 @@
             const [user, setUser] = useState(null);
             const [authToken, setAuthToken] = useState(null);
             const [showLoginModal, setShowLoginModal] = useState(false);
+            const [discoveredItems, setDiscoveredItems] = useState([]);
 
             // Check for existing authentication on page load
             useEffect(() => {
                 const token = localStorage.getItem('auth_token');
                 const userData = localStorage.getItem('user_data');
+                console.log('Stored user_data:', userData);
                 if (token && userData) {
-                    setAuthToken(token);
-                    setUser(JSON.parse(userData));
+                    const parsedUser = JSON.parse(userData);
+                    if (parsedUser && parsedUser.username) {
+                        setAuthToken(token);
+                        setUser(JSON.parse(userData));
+                    } else {
+                        throw new Error("Invalid user data in localStorage");
+                    }
                 }
             }, []);
 
+            // Fetch discovered items for the current user
+            const fetchDiscoveredItems = async () => {
+                if (!authToken) return;
+                try {
+                    const response = await fetch('http://localhost:8000/api/auth/profile/', {
+                        headers: {
+                            'Authorization': `Token ${authToken}`,
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.discovered_items) {
+                            setDiscoveredItems(data.discovered_items.map(item => item.name));
+                        }
+                    }
+                } catch (err) {
+                    console.error('Error fetching discovered items:', err);
+                }
+            };
+
+            // Fetch discovered items when user logs in or token changes
+            useEffect(() => {
+                if (authToken) {
+                    fetchDiscoveredItems();
+                }
+            }, [authToken]);
+
             const handleLogin = (userData, token) => {
+                if (!userData) {
+                    console.error('User data is undefined');
+                    return;
+                }
                 setUser(userData);
                 setAuthToken(token);
                 if (userData.is_staff || userData.is_superuser) {
@@ -307,7 +372,7 @@
                 const otherName = e.dataTransfer.getData('text/plain');
                 if (!otherName) return;
                 const target = workspaceItems[targetIndex];
-                if (!target || target.name === otherName) return;
+                if (!target) return;
 
                 try{
                     const headers = {'Content-Type':'application/json'};
@@ -330,6 +395,8 @@
                                 x: (target.x || 0) + 40,
                                 y: (target.y || 0) + 10
                             }]);
+                            // Refresh discovered items to show new item in sidebar
+                            fetchDiscoveredItems();
                         }
                     } else {
                         showMessage('Error: ' + (data.error || resp.statusText));
@@ -356,7 +423,7 @@
                     )}
                 </div>
 
-                <Sidebar onDragStart={handleDragStart}/>
+                <Sidebar onDragStart={handleDragStart} discoveredItems={discoveredItems}/>
                     <Workspace 
                     workspaceItems={workspaceItems}
                     onDrop={handleDrop}
