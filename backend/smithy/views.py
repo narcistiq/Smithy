@@ -10,15 +10,18 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import CraftingRecipe, Item, UserList
 from .serializer import ItemSerializer
 from typing import Optional
-import logging
+
+
 
 
 def combineItems(item1, item2) -> Optional[Item]:
+    """Return the result of combining item1 + item2, or None."""
     try:
         query = Q(item_a=item1, item_b=item2) | Q(item_a=item2, item_b=item1)
         return CraftingRecipe.objects.get(query).result
     except CraftingRecipe.DoesNotExist:
         return None
+
 
 
 @csrf_exempt
@@ -37,29 +40,47 @@ def register(request):
 
     user = User.objects.create_user(username=username, email=email, password=password)
     UserList.objects.get_or_create(user=user)
+
     token, _ = Token.objects.get_or_create(user=user)
 
-    return Response({"message": "User registered", "token": token.key}, status=201)
+    return Response({
+        "message": "User registered",
+        "token": token.key
+    }, status=201)
 
 
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):
+    """Login user and return token + user info"""
     username = request.data.get('username')
     password = request.data.get('password')
+
+    if not username or not password:
+        return Response({"error": "Username and password required"}, status=400)
 
     user = authenticate(username=username, password=password)
     if not user:
         return Response({"error": "Invalid credentials"}, status=401)
 
     token, _ = Token.objects.get_or_create(user=user)
-    return Response({"message": "Login successful", "token": token.key})
+
+    return Response({
+        "message": "Login successful",
+        "user": {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email
+        },
+        "token": token.key
+    }, status=200)
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout(request):
+    """Logout by deleting the token."""
     request.auth.delete()
     return Response({"message": "Logged out"})
 
@@ -71,10 +92,16 @@ def get_user_profile(request):
     items = profile.discovered_items.all()
 
     return Response({
-        "username": request.user.username,
+        "user": {
+            "id": request.user.id,
+            "username": request.user.username,
+            "email": request.user.email
+        },
         "discovered_items": [{"id": i.id, "name": i.name, "category": i.category} for i in items],
-        "count": items.count()
+        "total_discovered": items.count()
     })
+
+
 
 
 @api_view(['GET'])
@@ -93,12 +120,17 @@ def get_all_recipes(request):
     } for r in recipes])
 
 
+
+
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def combine_items(request):
     item1_name = request.data.get('item1_name')
     item2_name = request.data.get('item2_name')
+
+    if not item1_name or not item2_name:
+        return Response({"error": "Both item names are required"}, status=400)
 
     try:
         item1 = Item.objects.get(name__iexact=item1_name)
@@ -113,7 +145,14 @@ def combine_items(request):
     profile = UserList.objects.get(user=request.user)
 
     if profile.discovered_items.filter(id=result.id).exists():
-        return Response({"message": f"You already discovered {result.name}", "is_new": False})
+        return Response({
+            "message": f"You already discovered {result.name}",
+            "is_new": False
+        })
 
     profile.discovered_items.add(result)
-    return Response({"message": f"New discovery: {result.name}", "is_new": True})
+
+    return Response({
+        "message": f"New discovery: {result.name}",
+        "is_new": True
+    })

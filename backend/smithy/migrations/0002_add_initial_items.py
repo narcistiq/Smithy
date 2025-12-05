@@ -14,8 +14,6 @@ def add_initial_items(apps, schema_editor):
     
     data = load_data()
     
-
-    # 1. Create Items
     for item_data in data['items']:
         obj, created = Item.objects.get_or_create(
             name=item_data["name"],
