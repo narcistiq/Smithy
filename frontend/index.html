@@ -13,7 +13,10 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script type="text/babel">
         const { useState, useEffect } = React;
-        
+        import dotenv from 'dotenv';
+        dotenv.config();
+        const URL = process.env.BACKEND_API_URL;
+
         // Default images for basic materials
         const DEFAULT_MATERIALS = {
             stone: "./materials/stone.png",
@@ -118,7 +121,7 @@
                     : { username, email, password, is_admin: isAdmin };
 
                 try {
-                    const response = await fetch(`http://localhost:8000/api/${endpoint}`, {
+                    const response = await fetch(`${URL}/${endpoint}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -143,7 +146,7 @@
                     }
                 } catch (err) {
                     console.error('Registration/Login Error:', err);
-                    setError(`Network error: ${err.message}. Please check if the server is running on http://localhost:8000`);
+                    setError(`Network error: ${err.message}. Please check if the server is running on Railway.`);
                 } finally {
                     setLoading(false);
                 }
@@ -257,7 +260,7 @@
             const fetchDiscoveredItems = async () => {
                 if (!authToken) return;
                 try {
-                    const response = await fetch('http://localhost:8000/api/auth/profile/', {
+                    const response = await fetch(`${URL}/api/auth/profile/`, {
                         headers: {
                             'Authorization': `Token ${authToken}`,
                             'Content-Type': 'application/json',
@@ -289,14 +292,14 @@
                 setUser(userData);
                 setAuthToken(token);
                 if (userData.is_staff || userData.is_superuser) {
-                    window.location.href = `http://localhost:8000/admin/`;
+                    window.location.href = `${URL}/admin/`;
                 }
             };
 
             const handleLogout = async () => {
                 try {
                     if (authToken) {
-                        await fetch('http://localhost:8000/api/auth/logout/', {
+                        await fetch(`${URL}/api/auth/logout/`, {
                             method: 'POST',
                             headers: {
                                 'Authorization': `Token ${authToken}`,
@@ -359,7 +362,7 @@
             const handleDragOver = (e) => {
                 e.preventDefault();
             };
-            const API_BASE = 'http://localhost:8000/api';
+            const API_BASE = `${URL}/api`;
             const [message, setMessage] = useState('');
 
             function showMessage(msg){
