@@ -6,4 +6,8 @@ venv
 # system
 .env
 
+# npm
 node_modules
+
+# django
+staticfiles/
