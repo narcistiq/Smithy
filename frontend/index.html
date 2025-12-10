@@ -13,9 +13,7 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script type="text/babel">
         const { useState, useEffect } = React;
-        import dotenv from 'dotenv';
-        dotenv.config();
-        const URL = process.env.BACKEND_API_URL;
+        const URL = "https://smithy-production.up.railway.app";
 
         // Default images for basic materials
         const DEFAULT_MATERIALS = {
