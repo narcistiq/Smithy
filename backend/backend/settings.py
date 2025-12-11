@@ -29,13 +29,17 @@ SECRET_KEY = os.environ.get('DJANGO_SECRETKEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '.railway.app',
-    'smithyknights.netlify.app',
-]
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+'''
+=======
+optional environment based settings for flexibility
+=======
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+
+# define DEBUG and ALLOWED_HOSTS in the environment variables
+'''
 
 # Application definition
 
@@ -67,9 +71,10 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    'https://smithyknights.netlify.app',
-]
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(',')
 
 ROOT_URLCONF = "backend.urls"
 

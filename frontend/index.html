@@ -113,7 +113,7 @@
                 setLoading(true);
                 setError('');
 
-                const endpoint = isLoginMode ? 'auth/login/' : 'auth/register/';
+                const endpoint = isLoginMode ? 'api/auth/login/' : 'api/auth/register/';
                 const payload = isLoginMode 
                     ? { username, password }
                     : { username, email, password, is_admin: isAdmin };
