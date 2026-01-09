@@ -407,7 +407,9 @@
                         }
                     } else {
                         const errorMsg = data.error || data.detail || data.message || resp.statusText || 'Unknown error';
-                        showMessage('Error: ' + errorMsg);
+                        const isAuthError = resp.status === 401 || resp.status === 403;
+                        const authHint = isAuthError ? ' Please log in to your account.' : '';
+                        showMessage('Error: ' + errorMsg + authHint);
                     }
                 } catch(err){
                     showMessage('Network error: ' + err.message);
