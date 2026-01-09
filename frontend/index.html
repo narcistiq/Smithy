@@ -144,7 +144,12 @@
                     }
                 } catch (err) {
                     console.error('Registration/Login Error:', err);
-                    setError(`Network error: ${err.message}. Please check if the server is running on Railway.`);
+                    const isNetworkError = err.message === 'Failed to fetch' || !navigator.onLine;
+                    setError(
+                        isNetworkError
+                            ? 'Cannot reach server. Please check your internet connection.'
+                            : `Connection error: ${err.message}`
+                    );
                 } finally {
                     setLoading(false);
                 }
@@ -401,7 +406,8 @@
                             fetchDiscoveredItems();
                         }
                     } else {
-                        showMessage('Error: ' + (data.error || resp.statusText));
+                        const errorMsg = data.error || data.detail || data.message || resp.statusText || 'Unknown error';
+                        showMessage('Error: ' + errorMsg);
                     }
                 } catch(err){
                     showMessage('Network error: ' + err.message);
